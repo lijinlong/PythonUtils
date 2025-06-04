@@ -12,3 +12,11 @@
 `python RemoveDupFiles.py`
 `python RemoveDupFiles.py .`
 
+# GatherRes.py
+生成资源列表，用法详见GatherRes.py
+`python GatherRes.py e:\\Book_tbd\\res\\res.json MyRes.json`
+
+# SearchRes.py
+从Resources.json中进行关键字搜索，关键字支持普通文本、与、或及正则表达式
+`python SearchRes.py Resources.json 关键字`
+
