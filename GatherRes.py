@@ -1,11 +1,13 @@
 import json
 import os
 import sys
+import re
 
 def print_help():
     print("用法: python GatherRes.py <res.json路径> [输出文件名]")
     print("  <res.json路径>    必填，资源配置json文件路径")
     print("  [输出文件名]      可选，输出json文件名，默认Resources.json")
+    print("\n支持目录深度控制：在目录路径后加 :数字 ，如 G:/Books:2 表示只递归2层。\n")
     print("示例:")
     print("  python GatherRes.py e:\\Book_tbd\\res\\res.json MyRes.json")
     print("  python GatherRes.py e:\\Book_tbd\\res\\res.json")
@@ -18,7 +20,7 @@ def print_help():
     },
     "Movies": {
         "desc": "Movies",
-        "dirs": ["G:\\\\Entertainment"],
+        "dirs": ["G:\\\\Entertainment:1"],
         "exceptions": [
             "百家讲坛",
             "广播剧有声书",
@@ -61,16 +63,21 @@ def print_help():
     ]
 }''')
 
-def scan_dir(root, filters, exceptions):
-    # 返回紧凑嵌套列表结构，不包含root本身
+def scan_dir(root, filters, exceptions, depth=0, max_depth=None):
     result = []
     for entry in os.scandir(root):
         if entry.is_dir():
             if any(exc in entry.path for exc in exceptions):
                 continue
-            sub = scan_dir(entry.path, filters, exceptions)
-            if sub:
-                result.append([entry.name, sub])
+            if max_depth is not None and depth + 1 >= max_depth:
+                # 不递归，只显示子目录名
+                result.append([entry.name, ["..."]])
+            else:
+                sub = scan_dir(entry.path, filters, exceptions, depth+1, max_depth)
+                if sub:
+                    result.append([entry.name, sub])
+                else:
+                    result.append(entry.name)
         elif entry.is_file():
             ext = os.path.splitext(entry.name)[1].lower()
             if not filters or ext in filters:
@@ -85,9 +92,17 @@ def scan_resource(name, resource):
     exceptions = set(resource.get("exceptions", []))
     all_results = []
     for base_dir in dirs:
+        # 判断base_dir是否以:数字结尾
+        m = re.search(r':(\d+)$', base_dir)
+        if m:
+            real_dir = base_dir[:m.start()]
+            max_depth = int(m.group(1))
+        else:
+            real_dir = base_dir
+            max_depth = None
         all_results.append({
-            "dir": base_dir,
-            "contents": scan_dir(base_dir, filters, exceptions)
+            "dir": real_dir,
+            "contents": scan_dir(real_dir, filters, exceptions, depth=0, max_depth=max_depth)
         })
     return all_results
 
