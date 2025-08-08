@@ -171,7 +171,7 @@ if __name__ == "__main__":
             content = item.get_content().decode('utf-8')
             extract_comments_from_xhtml(content, info_dict)
     
-    print(info_dict)
+    #print(info_dict)
     with open("geometry.json", 'w', encoding='utf-8') as f:
         json.dump(info_dict, f, ensure_ascii=False, indent=4)
     print("Geometry information has been saved to 'geometry.json'.")

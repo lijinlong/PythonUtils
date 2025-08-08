@@ -12,98 +12,86 @@ def get_img_id(id):
 def get_vid_id(id):
     return f"vid_{id:0>4}"
 
+# 映射实体书页码到电子书页码,每本书映射都不同，需要修改
+def pg_from_rel(pg):
+    # 实体页码1-103 -> + 2 (3-105)
+    # 实体页码105-149 -> + 1 (106-150)
+    # 实体页码151-154 -> + 0 (151-154)
+    id = pg
+    if pg < 103:
+        id = pg + 2
+    elif pg < 151:
+        id = pg + 1
+    return id
+
+def map_rel_pg(pg):
+    return get_img_id(pg_from_rel(pg))
+
+
+# 音频页码映射，实体书对应页码有音频文件，会在对应页码添加相应音频文件可以点击相关区域进行播放
+audio_pg_map = {
+    # 音频页码映射 实体书页码:[音频编号]
+    #10: [1], # 音频1在实体书第10页
+    #76: [ i for i in range(63, 67+1) ],
+    #146: list(range(40, 60+1)) + list(range(109, 116+1)),
+}
+
+# 如果书中有练习题，答案页码与对应练习题出现的页码，会在练习题页码添加答案页码的图片方便在练习题页查看答案。也可以在book_info["book_info"]中手动添加#pg_from_rel(rel_pg) : [ get_img_id(102) ] 102为答案页部分截图
+answer_map = {
+    # 答案页码映射，页码为实体书页码，对应文件应+2 实体书页码: [答案在本页的练习题页码]
+    #145: list(range(10, 34+1)) + list(range(106, 108+1)), #答案页145(+2)的答案对应练习页10-34和106-108
+}
+
+
 # DEBUG_AREA = True
 DEBUG_AREA = False
 
 book_info = {
-    "name": "Slovenscina_Ekspres_1",
-    "lang": "sl",
-    "author": "Tanja Jerman, Staša Pisek, Anja Strajner",
-    "title": "1 Slovenscina Ekspres",
+    "name": "<bookname>",
+    "lang": "<lang>",
+    "author": "<author>",
+    "title": "<title>",
 
-    "cover": "cover.jpg",
-    "image_folder": "img",
+    "cover": "cover.jpeg",
+    "image_folder": "images",
     "audio_folder": "audio",
-    "page_num": 81, #fisst pageis 1
+    "page_num": 154, #first page is 1
     "page_fmt": "Page_{:03d}",
     "active_pages": {
-        # 页码 : [提示图get_img_id(图片编号), 音频get_aud_id(音频编号), 提示文字txt标识, ...]
-        7 : [ get_img_id(102) ],
-        8 : [ get_img_id(102), get_aud_id(1), get_aud_id(2) ],
-        9 : [ get_img_id(102) ],
-        10: [ get_img_id(113) ],
-        11: [ get_img_id(113), get_aud_id(3)],
-        12: [ get_img_id(113), get_aud_id(4) ],
-        13: [ get_img_id(113) ],
-        14: [ get_img_id(123), get_aud_id(5) ],
-        15: [ get_img_id(123) ],
-        16: [ get_img_id(129), get_aud_id(6), get_aud_id(7) ],
-        17: [ get_img_id(131) ],
-        18: [ get_img_id(131) ],
-        19: [ get_img_id(131) ],
-        21: [ get_img_id(201) ],
-        22: [ get_img_id(201), get_aud_id(8), get_aud_id(9) ],
-        23: [ get_img_id(201), get_aud_id(10) ],
-        24: [ get_img_id(209) ],
-        25: [ get_img_id(209), get_aud_id(11) ],
-        26: [ get_img_id(215) ],
-        27: [ get_img_id(218), get_aud_id(12), get_aud_id(13) ],
-        28: [ get_img_id(219), get_aud_id(14) ],
-        29: [ get_img_id(219), get_aud_id(15) ],
-        31: [ get_img_id(301) ],
-        32: [ get_img_id(301) ],
-        33: [ get_img_id(301), get_aud_id(16) ],
-        35: [ get_img_id(311), get_aud_id(17) ],
-        36: [ get_img_id(311), get_aud_id(18) ],
-        37: [ get_img_id(317), get_aud_id(19) ],
-        38: [ get_img_id(321), get_aud_id(20) ],
-        40: [ get_img_id(401) ],
-        41: [ get_img_id(401), get_aud_id(21) ],
-        42: [ get_img_id(401), get_aud_id(22), get_aud_id(23) ],
-        43: [ get_img_id(411) ],
-        44: [ get_img_id(411), get_aud_id(24) ],
-        45: [ get_img_id(418) ],
-        46: [ get_img_id(418), get_aud_id(25) ],
-        47: [ get_img_id(418), get_aud_id(26) ],
-        50: [ get_img_id(501) ],
-        51: [ get_img_id(501), get_aud_id(27) ],
-        52: [ get_img_id(501) ],
-        53: [ get_img_id(501) ],
-        54: [ get_img_id(509), get_aud_id(28), get_aud_id(29) ],
-        55: [ get_img_id(509), get_aud_id(30) ],
-        56: [ get_img_id(509), get_aud_id(31) ],
-        58: [ get_img_id(601), get_aud_id(32) ],
-        59: [ get_img_id(601), get_aud_id(33) ],
-        60: [ get_img_id(601) ],
-        61: [ get_img_id(601) ],
-        62: [ get_img_id(611), get_aud_id(34), get_aud_id(35) ],
-        63: [ get_img_id(611), get_aud_id(36) ],
-        64: [ get_img_id(611) ],
-        65: [ get_img_id(611), get_aud_id(37) ],
-        72: [ get_aud_id(i) for i in range(1, 10) ],
-        73: [ get_aud_id(i) for i in range(10, 20) ],
-        74: [ get_aud_id(i) for i in range(19, 29) ],
-        75: [ get_aud_id(i) for i in range(29, 38) ],
+        # 页码(电子书页码) : [提示图get_img_id(图片编号), 音频get_aud_id(音频编号), 提示文字txt标识, ...]
+        #8 : [ get_img_id(102), get_aud_id(1), get_aud_id(2) ],
+        #pg_from_rel(n): [ map_rel_pg(102), get_aud_id(audid) ],
     },
     "toc" : [
+        # 目录
         #(页码, 标题)
-        (5, "Uvod/Introduction - Introduction - 简介"),
-        (7, "1. enota: Dober dan - Greeting - 单元 1：打招呼"),
-        (21, "2. enota: Družina in prijateljin - Unit 2: Family and friends - 单元 2：家人和朋友"),
-        (31, "3. enota: Hiša - Unit 3: House - 单元 3：房子"),
-        (40, "4. enota: Moj dan - Unit 4: My day - 单元 4：我的一天"),
-        (50, "5. enota: Hrana in pijača - Unit 5: Food and drink - 简介"),
-        (58, "6. enota: Mesto - Unit 6: City - 单元 6：城市"),
-        (68, "Slovnične preglednice-skloni - Grammar charts-inflections - 语法表-词形变化"),
-        (69, "Slovnične preglednice - glagoli -  Grammar charts-verbs - 语法表-动词"),
-        (70, "Seznam pogostih glagolov - List of common verbs - 常用动词列表"),
-        (72, "Zapis govorjenih besedil - Transcription of spoken texts - 听力文本"),
-        (76, "Rešitve - Solutions - 答案"),
-        (79, "Pregledno kazalo - Index - 索引"),
+        #(pg_from_rel(5), "Uvod - 斯语简介"),
     ]
 }
 
-def get_page_name(pageIdx):
+for pg, exs in answer_map.items():
+    # 将答案页码映射到电子书相应页码
+    ans_pg = map_rel_pg(pg)
+    for ex in exs:
+        ex_pg = pg_from_rel(ex)
+        if ex_pg not in book_info["active_pages"]:
+            book_info["active_pages"][ex_pg] = [ ans_pg ]
+        else:
+            book_info["active_pages"][ex_pg].extend([ ans_pg ])
+
+for pg, auds in audio_pg_map.items():
+    # 将音频页码映射到电子书页码
+    aud_pg = pg_from_rel(pg)
+    if aud_pg not in book_info["active_pages"]:
+        book_info["active_pages"][aud_pg] = [ get_aud_id(aud) for aud in auds ]
+    else:
+        book_info["active_pages"][aud_pg].extend([ get_aud_id(aud) for aud in auds ])  # 确保音频页码列表存在
+
+print("\nActive pages:")
+for pg, items in book_info["active_pages"].items():
+    print(f"  {pg}: {items}")
+
+def get_page_name(pageIdx): 
     return book_info["page_fmt"].format(pageIdx)
 
 # 样式
@@ -143,9 +131,9 @@ style = '''
 .hint-img {{
     position: absolute;
     display: {debug_area}; /* 默认隐藏 */
-    top: 10%;
-    left: 10%;
-    width: 50%;
+    top: 15%;
+    left: 5%;
+    width: 80%;
     /* 可视化调试用：可设置 border */
     border: 1px solid blue;
 }}
@@ -354,11 +342,13 @@ else:
             el_item = f"elem_{elname}"
             x,y,w,h = 1, 5+10*i, 0, 0
             if el.startswith("img_"):
-                y = 90
+                x, y = 0, 0
             geometry[hint_item] = [x, y, w, h]
-            x = 45
+            x = 5
             if el.startswith("aud_"):
                 x, y, w, h = 0, 0, 0, 0
+            if el.startswith("img_"):
+                x = 15
             geometry[el_item] = [x, y, w, h]
             if el.startswith("txt"):
                 geometry[f"{el_item}:text"] = "Simple text"

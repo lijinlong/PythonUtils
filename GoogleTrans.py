@@ -7,7 +7,7 @@ from googletrans import Translator
 ### 需要安装 googletrans 库 ·pip install googletrans·
 
 # 设置置信度阈值
-ACCEPT_CONFIDENCE = 0.9  
+ACCEPT_CONFIDENCE = 0.8  
 
 async def translate_text(text, src_lang='auto', target_langs=None, translations=None):
     if target_langs is None:
