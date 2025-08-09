@@ -34,6 +34,7 @@ def extract_numberxy(name):
         num = int(numbers[0])
     return num
 
+excluded_keys = ['top', 'left', 'width', 'height', 'display']
 def extract_comments_from_xhtml(xhtml_content, result):
     soup = BeautifulSoup(xhtml_content, 'lxml')
     for div in soup.find_all('div'):
@@ -46,7 +47,7 @@ def extract_comments_from_xhtml(xhtml_content, result):
             match = re.match(click_elem_pattern, onclick)
             if match:
                 elem_name = f"hint_{match.group(1)}"
-        if "audio-zone" in classes:    
+        if "audio-zone" in classes:
             click_elem_pattern = r"playAudio\('([^']*)'\)"
             match = re.match(click_elem_pattern, onclick)
             if match:
@@ -68,8 +69,11 @@ def extract_comments_from_xhtml(xhtml_content, result):
             y = extract_numberxy(style_dict.get('top', '0%'))
             width = style_dict.get('width', 0)
             height = style_dict.get('height', 0)
-            
-            result[elem_name] = [x, y, width, height]
+            ext = ""
+            for key, value in style_dict.items():
+                if key not in excluded_keys:
+                    ext += f"{key}:{value}; "
+            result[elem_name] = [x, y, width, height, ext]
     for img in soup.find_all('img'):
         img_id = img.get('id', '')
         clz = img.get('class', [])
@@ -82,16 +86,22 @@ def extract_comments_from_xhtml(xhtml_content, result):
             y = extract_numberxy(style_dict.get('top', '0%'))
             width = style_dict.get('width', 0)
             height = style_dict.get('height', 0)
-
-            result[elem_name] = [x, y, width, height]
+            ext = ""
+            for key, value in style_dict.items():
+                if key not in excluded_keys:
+                    ext += f"{key}:{value}; "
+            result[elem_name] = [x, y, width, height, ext]
     for audio in soup.find_all('audio'):
         audio_id = audio.get('id', '')
         if audio_id:
             elem_name = f"elem_{audio_id}"
             # 这里假设音频没有样式属性，直接使用默认位置
             x, y, width, height = 0, 0, 0, 0
-
-            result[elem_name] = [x, y, width, height]
+            ext = ""
+            for key, value in style_dict.items():
+                if key not in excluded_keys:
+                    ext += f"{key}:{value}; "
+            result[elem_name] = [x, y, width, height, ext]
 
 # 示例用法
 html_c ='''
