@@ -1,0 +1,31 @@
+{
+    "num_of_simple_in_task1":3,
+    "info_task1_simple":[
+        "Država",
+        ["Kraj rojstva", "Mesto rojstva"],
+        ["Starost", "Rojstni dan", "Datum rojstva"],
+        "Naslov",
+        "E-naslov",
+        "Telefon",
+        "Poklic",
+        "Jezek"
+    ],
+    "num_of_complex_in_task1":2,
+    "info_task1_complex":[
+        "Moje stanovanje",
+        "Hobiji",
+        ["Moja družina", "Moj prijatelj/Moja prijateljca", "Moj sošolec/Moja sošolka"],
+        "Moj dan",
+        "Moj prosti čas",
+        ["Moja država", "Moj kraj rojstva"],
+        "Moja tradicionalna hrana"
+    ],
+    "info_task2_pics":[
+        "pic01.png",
+        "pic02.png",
+        "pic03.png",
+        "pic04.png",
+        "pic05.png",
+        "pic06.png"
+    ]
+}
