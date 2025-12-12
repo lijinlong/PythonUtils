@@ -212,6 +212,21 @@ class DocxFileWalker:
     def end(self):
         self.document.save(self.file_path)
 
+def extendsFolderForPic(list):
+    pics = []
+    suppoeted_file_format = (".jpg", ".png")
+    for f in list:
+        if os.path.exists(f):
+            if os.path.isfile(f):
+                if f.lower().endswith(suppoeted_file_format):
+                    pics.append(f)
+            elif os.path.isdir(f):
+                images = os.listdir(f)
+                for file in images:
+                    if file.lower().endswith(suppoeted_file_format):
+                        pics.append(os.path.join(f, file))
+    return pics
+
 class Exam:
     def __init__(self, json_path):
         if not os.path.exists(json_path):
@@ -227,7 +242,7 @@ class Exam:
         self.num_of_complex_in_task1 = data.get("num_of_complex_in_task1", 2)
         self.info_task1_complex = data.get("info_task1_complex", [ "Moje stanovanje", "Hobiji", "Moja družina", "Moj dan" ])
         self.num_of_pic_for_tak2 = 2
-        self.info_task2_pics = data.get("info_task2_pics", ["pic01.png","pic02.png","pic03.png"])
+        self.info_task2_pics = extendsFolderForPic(data.get("info_task2_pics", ["pic01.png","pic02.png","pic03.png"]))
 
     def MakeChoice(self, selected_info, group, num):
         '''随机选择 num 个元素到 selected_info 中'''
