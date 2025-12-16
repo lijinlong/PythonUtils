@@ -22,13 +22,19 @@ class ExamGUI:
             exe_dir = os.path.dirname(sys.executable)
             script_dir = os.path.dirname(os.path.abspath(__file__))
             file_list  = [ sample_json_file , "DejaVuSans.ttf", "DejaVuSans-Bold.ttf" ]
+            # 拷贝文件到exe目录
             for f in file_list:
                 dst_path = os.path.join(exe_dir, f)
                 if not os.path.exists(dst_path):
                     shutil.copy(os.path.join(script_dir, f), dst_path)
+            # 创建图片文件夹并拷贝样例图片
+            for f in ["ImgA1", "ImgA2"]:
+                dst_path = os.path.join(exe_dir, f)
+                if not os.path.exists(dst_path):
+                    os.makedirs(dst_path)
             for i in range(1, 6+1):
                 img = f"pic{i:02d}.png"
-                dst_path = os.path.join(exe_dir, img)
+                dst_path = os.path.join(exe_dir, "ImgA1", img)
                 if not os.path.exists(dst_path):
                     shutil.copy(os.path.join(script_dir, "pic00.png"), dst_path)
 
